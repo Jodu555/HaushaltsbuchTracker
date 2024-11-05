@@ -60,7 +60,7 @@ const {
 	status: activeStatus,
 	error: activeError,
 	refresh: activeRefresh,
-} = await useFetch('http://localhost:3600/api/active', {
+} = await useFetch('http://169.254.75.240:4444/api/active', {
 	transform: (data: string[]) =>
 		data.map((slug) => {
 			return { slug, input: '' };
@@ -71,7 +71,7 @@ const {
 	status: calcsStatus,
 	error: calcsError,
 	refresh: calcsRefresh,
-} = await useFetch<CalcItem[]>('http://localhost:3600/api/calcs', {
+} = await useFetch<CalcItem[]>('http://169.254.75.240:4444/api/calcs', {
 	transform: (data) => data.map((calc) => ({ ...calc, output: eval(calc.calc) as string })),
 });
 
@@ -83,7 +83,7 @@ async function submitRecords() {
 		data[active.slug] = active.input;
 	}
 	console.log(data);
-	const response = await fetch('http://localhost:3600/api/data', {
+	const response = await fetch('http://169.254.75.240:4444/api/data', {
 		method: 'POST',
 		body: JSON.stringify(data),
 		headers: {
@@ -179,7 +179,7 @@ watch(
 			const body: Record<string, string> = {};
 			body[slug] = changes.calc.new;
 
-			fetch('http://localhost:3600/api/calcs', {
+			fetch('http://169.254.75.240:4444/api/calcs', {
 				method: 'POST',
 				body: JSON.stringify(body),
 				headers: {
@@ -196,7 +196,7 @@ watch(
 const last = computedAsync(async () => {
 	const output: Record<string, { x: number; y: number }> = {};
 	for (const active of activeData.value!) {
-		const lastF = await fetch(`http://localhost:3600/api/last/${active.slug}`).then((res) => res.json());
+		const lastF = await fetch(`http://169.254.75.240:4444/api/last/${active.slug}`).then((res) => res.json());
 		output[active.slug] = lastF;
 		const calcData = calcsData.value!.find((calc) => calc.slug === active.slug);
 		if (calcData) {
