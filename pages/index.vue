@@ -55,23 +55,26 @@
 <script lang="ts" setup>
 import { computedAsync } from '@vueuse/core';
 
+const API_URL = 'http://192.168.178.23:4444/api';
+
 const {
 	data: activeData,
 	status: activeStatus,
 	error: activeError,
 	refresh: activeRefresh,
-} = await useFetch('http://169.254.75.240:4444/api/active', {
+} = await useFetch(`${API_URL}/active`, {
 	transform: (data: string[]) =>
 		data.map((slug) => {
 			return { slug, input: '' };
 		}),
 });
+
 const {
 	data: calcsData,
 	status: calcsStatus,
 	error: calcsError,
 	refresh: calcsRefresh,
-} = await useFetch<CalcItem[]>('http://169.254.75.240:4444/api/calcs', {
+} = await useFetch<CalcItem[]>(`${API_URL}/calcs`, {
 	transform: (data) => data.map((calc) => ({ ...calc, output: eval(calc.calc) as string })),
 });
 
@@ -83,7 +86,7 @@ async function submitRecords() {
 		data[active.slug] = active.input;
 	}
 	console.log(data);
-	const response = await fetch('http://169.254.75.240:4444/api/data', {
+	const response = await fetch(`${API_URL}/data`, {
 		method: 'POST',
 		body: JSON.stringify(data),
 		headers: {
@@ -179,7 +182,7 @@ watch(
 			const body: Record<string, string> = {};
 			body[slug] = changes.calc.new;
 
-			fetch('http://169.254.75.240:4444/api/calcs', {
+			fetch(`${API_URL}/calcs`, {
 				method: 'POST',
 				body: JSON.stringify(body),
 				headers: {
@@ -196,7 +199,7 @@ watch(
 const last = computedAsync(async () => {
 	const output: Record<string, { x: number; y: number }> = {};
 	for (const active of activeData.value!) {
-		const lastF = await fetch(`http://169.254.75.240:4444/api/last/${active.slug}`).then((res) => res.json());
+		const lastF = await fetch(`${API_URL}/last/${active.slug}`).then((res) => res.json());
 		output[active.slug] = lastF;
 		const calcData = calcsData.value!.find((calc) => calc.slug === active.slug);
 		if (calcData) {

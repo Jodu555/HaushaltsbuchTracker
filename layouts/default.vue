@@ -16,10 +16,10 @@
 				<div class="collapse navbar-collapse" id="navbarNav">
 					<ul class="navbar-nav">
 						<li class="nav-item">
-							<a class="nav-link active" aria-current="page" href="#">Input</a>
+							<NuxtLink to="/" class="nav-link" active-class="active">Home</NuxtLink>
 						</li>
 						<li class="nav-item">
-							<a class="nav-link disabled" href="/view">View</a>
+							<NuxtLink to="/view" class="nav-link" active-class="active">View</NuxtLink>
 						</li>
 					</ul>
 				</div>
