@@ -1,6 +1,14 @@
 <template>
 	<div>
 		<h1 class="text-center mt-2 mb-4">Calcs</h1>
+		<div class="d-flex justify-content-around">
+			<div class="form-check form-switch">
+				<input class="form-check-input" v-model="backlog" type="checkbox" id="flexSwitchCheckChecked" checked />
+				<label class="form-check-label" for="flexSwitchCheckChecked">Backlog</label>
+			</div>
+			<span v-if="backlog" class="h5">{{ realDate.toLocaleString('de') }} || {{ date }}</span>
+			<input v-if="backlog" type="date" name="date" id="date" v-model="date" />
+		</div>
 		<div>
 			<div v-for="calc in calcsData" class="mt-3" :key="calc.slug">
 				<label class="form-label h2" :for="calc.slug">Calc {{ calc.slug }}</label>
@@ -35,7 +43,8 @@
 						:id="active.slug"
 						class="form-control"
 						placeholder=""
-						:disabled="Boolean(calcsData!.find((calc) => calc.slug === active.slug))"
+						:disabled="!backlog
+						&& Boolean(calcsData!.find((calc) => calc.slug === active.slug))"
 						:aria-describedby="active + 'Id'"
 						v-model="active.input" />
 					<small :id="active + 'Id'" class="text-muted">Last reward: {{ last?.[active.slug].y }}</small>
@@ -55,7 +64,15 @@
 <script lang="ts" setup>
 import { computedAsync } from '@vueuse/core';
 
+// const API_URL = 'http://localhost:3600/api';
 const API_URL = 'http://192.168.178.23:4444/api';
+
+const backlog = ref(false);
+const date = ref(Date.now());
+
+const realDate = computed(() => {
+	return new Date(date.value);
+});
 
 const {
 	data: activeData,
@@ -86,14 +103,25 @@ async function submitRecords() {
 		data[active.slug] = active.input;
 	}
 	console.log(data);
-	const response = await fetch(`${API_URL}/data`, {
-		method: 'POST',
-		body: JSON.stringify(data),
-		headers: {
-			'Content-Type': 'application/json',
-		},
-	});
-	console.log(response);
+	if (backlog.value == true) {
+		const response = await fetch(`${API_URL}/data/${date.value}`, {
+			method: 'POST',
+			body: JSON.stringify(data),
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		});
+		console.log(response);
+	} else {
+		const response = await fetch(`${API_URL}/data`, {
+			method: 'POST',
+			body: JSON.stringify(data),
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		});
+		console.log(response);
+	}
 }
 
 interface CalcItem {

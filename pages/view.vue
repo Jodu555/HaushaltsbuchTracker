@@ -38,6 +38,7 @@
 
 <script lang="ts" setup>
 const API_URL = 'http://192.168.178.23:4444/api';
+// const API_URL = 'http://localhost:3600/api';
 
 const sliceAmount = ref(10);
 
@@ -56,7 +57,7 @@ const {
 const previous = computedAsync(async () => {
 	const output: Record<string, { x: number; y: number }[]> = {};
 	for (const active of activeData.value!) {
-		const lastF = (await fetch(`${API_URL}/data/${active.slug}`).then((res) => res.json())) as { x: number; y: number }[];
+		const lastF = (await fetch(`${API_URL}/data/${active.slug}/true`).then((res) => res.json())) as { x: number; y: number }[];
 		lastF.sort((a, b) => b.x - a.x);
 		output[active.slug] = lastF;
 	}
