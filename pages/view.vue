@@ -37,8 +37,9 @@
 </template>
 
 <script lang="ts" setup>
-const API_URL = 'http://192.168.178.23:4444/api';
-// const API_URL = 'http://localhost:3600/api';
+import useAPIURL from '~/hooks/useAPIURL';
+
+const API_URL = useAPIURL();
 
 const sliceAmount = ref(10);
 
